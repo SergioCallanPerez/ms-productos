@@ -32,7 +32,8 @@ public class ProductoService {
     }
 
     public Mono<Producto> save(Producto producto) {
-        return repository.save(producto);
+        return repository.save(producto)
+                .onErrorMap(R2dbcExceptionUtil::handleR2dbcException);
     }
 
     public Mono<Producto> update(Long id, Producto updated) {
