@@ -1,0 +1,217 @@
+openapi: 3.0.3
+info:
+  title: API de Productos
+  description: API REST para la gestión de productos, su stock y su información general.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8081
+    description: Servidor local
+
+paths:
+  /api/productos:
+    get:
+      summary: Listar productos
+      description: Obtiene la lista completa de productos registrados en el sistema.
+      operationId: listarProductos
+      responses:
+        "200":
+          description: Lista de productos obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductoResponse'
+
+    post:
+      summary: Crear producto
+      description: Crea un nuevo producto en el sistema.
+      operationId: crearProducto
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductoRequest'
+      responses:
+        "201":
+          description: Producto creado exitosamente
+        "400":
+          description: Error en los datos del producto
+
+  /api/productos/{id}:
+    get:
+      summary: Obtener producto por ID
+      description: Retorna la información de un producto específico por su ID.
+      operationId: obtenerProductoPorId
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: Producto encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductoResponse'
+        "404":
+          description: Producto no encontrado
+
+    put:
+      summary: Modificar producto
+      description: Actualiza la información completa de un producto.
+      operationId: modificarProducto
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 8
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductoRequest'
+      responses:
+        "200":
+          description: Producto actualizado exitosamente
+        "404":
+          description: Producto no encontrado
+
+    delete:
+      summary: Eliminar producto
+      description: Elimina un producto existente por su ID.
+      operationId: eliminarProducto
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 10
+      responses:
+        "204":
+          description: Producto eliminado exitosamente
+        "404":
+          description: Producto no encontrado
+
+  /api/productos/{id}/stock:
+    patch:
+      summary: Actualizar stock de producto
+      description: Disminuye o aumenta el stock de un producto determinado.
+      operationId: actualizarStock
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 5
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cantidad:
+                  type: integer
+                  example: 1
+      responses:
+        "200":
+          description: Stock actualizado correctamente
+        "400":
+          description: Error al actualizar el stock
+        "404":
+          description: Producto no encontrado
+
+  /api/productos/bajo-stock/{cantidad}:
+    get:
+      summary: Obtener productos con stock bajo
+      description: Retorna los productos cuyo stock es menor o igual al valor especificado.
+      operationId: obtenerProductosBajoStock
+      parameters:
+        - name: cantidad
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 5
+      responses:
+        "200":
+          description: Lista de productos con bajo stock
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductoResponse'
+
+components:
+  schemas:
+    ProductoRequest:
+      type: object
+      properties:
+        nombre:
+          type: string
+          example: Laptop Dell
+        descripcion:
+          type: string
+          example: Laptop i7 16GB RAM
+        precio:
+          type: number
+          format: double
+          example: 1250.0
+        stock:
+          type: integer
+          example: 20
+        activo:
+          type: boolean
+          example: true
+        fechaCreacion:
+          type: string
+          format: date-time
+          example: 2025-11-01T19:55:37Z
+
+    ProductoResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 8
+        nombre:
+          type: string
+          example: Laptop Dell
+        descripcion:
+          type: string
+          example: Laptop i7 16GB RAM
+        precio:
+          type: number
+          format: double
+          example: 1250.0
+        stock:
+          type: integer
+          example: 10
+        activo:
+          type: boolean
+          example: true
+        fechaCreacion:
+          type: string
+          format: date-time
+          example: 2025-11-01T19:55:37Z
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
