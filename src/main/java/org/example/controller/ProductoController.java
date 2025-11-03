@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import org.example.dto.ProductoDTO;
 import org.example.entities.Producto;
 import org.example.exception.APIException;
 import org.example.service.ProductoService;
@@ -62,7 +63,7 @@ public class ProductoController {
 
     // Obtener productos con bajo stock
     @GetMapping(value = "/bajo-stock/{minimo}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Flux<Producto> obtenerProductosBajoStock(@PathVariable Integer minimo) {
+    public Flux<ProductoDTO> obtenerProductosBajoStock(@PathVariable Integer minimo) {
         return service.obtenerProductosBajoStock(minimo);
     }
 }

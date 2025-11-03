@@ -1,5 +1,6 @@
 package org.example.service;
 
+import org.example.dto.ProductoDTO;
 import org.example.entities.Producto;
 import org.example.exception.APIException;
 import org.example.exception.R2dbcExceptionUtil;
@@ -8,6 +9,8 @@ import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.time.LocalDateTime;
 
 @Service
 public class ProductoService {
@@ -60,12 +63,12 @@ public class ProductoService {
     }
 
     // Llamada a productos_bajo_stock
-    public Flux<Producto> obtenerProductosBajoStock(Integer minimo) {
+    public Flux<ProductoDTO> obtenerProductosBajoStock(Integer minimo) {
         return databaseClient
                 .sql("SELECT * FROM productos_bajo_stock(:minimo)")
                 .bind("minimo", minimo)
                 .map((row, metadata) -> {
-                    Producto p = new Producto();
+                    ProductoDTO p = new ProductoDTO();
                     p.setId(row.get("id", Long.class));
                     p.setNombre(row.get("nombre", String.class));
                     p.setStock(row.get("stock", Integer.class));
