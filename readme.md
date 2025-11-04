@@ -70,11 +70,11 @@ Crear en cada base de datos:
   SELECT stock INTO v_stock_actual FROM productos WHERE id = p_producto_id;
 
   IF NOT FOUND THEN
-  RAISE EXCEPTION 'Producto con id % no encontrado', p_producto_id;
+  RAISE EXCEPTION 'ERROR[404]: Producto con id % no encontrado', p_producto_id;
   END IF;
 
   IF v_stock_actual < p_cantidad THEN
-  RAISE EXCEPTION 'Stock insuficiente para el producto %', p_producto_id;
+  RAISE EXCEPTION 'ERROR[400]: Stock insuficiente para el producto %', p_producto_id;
   END IF;
 
   UPDATE productos
