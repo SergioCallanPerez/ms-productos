@@ -2,11 +2,12 @@ package org.example.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
-import org.springframework.http.HttpMethod;
 
 @Configuration
 @EnableWebFluxSecurity
@@ -21,28 +22,28 @@ public class SecurityConfig {
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         return http
-                // 1. Deshabilita CSRF
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
-
-                // 2. Habilita CORS y usa el Bean de configuración CorsConfigurationSource
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
-
-                // 3. Configuración de autorización
                 .authorizeExchange(exchanges -> exchanges
-                        // [A] PERMITIR OPTIONS
+                        // Permitir preflight requests
                         .pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                        // [B] PERMITIR RUTAS DE PRODUCTO
-                        .pathMatchers("/api/**").permitAll()
+                        .pathMatchers("/actuator/**").permitAll()
 
-                        // [C] CUALQUIER OTRA RUTA: Requerir autenticación.
+                        // Protegidas con scopes
+                        .pathMatchers(HttpMethod.GET, "/api/productos").hasAuthority("SCOPE_productos_read")
+                        .pathMatchers(HttpMethod.GET, "/api/productos/{id}").hasAuthority("SCOPE_productos_read")
+                        .pathMatchers(HttpMethod.POST, "/api/productos").hasAuthority("SCOPE_productos_create")
+                        .pathMatchers(HttpMethod.PUT, "/api/productos/{id}").hasAuthority("SCOPE_productos_update")
+                        .pathMatchers(HttpMethod.DELETE, "/api/productos/{id}").hasAuthority("SCOPE_productos_delete")
+                        .pathMatchers(HttpMethod.PATCH, "/api/productos/{stock}/stock").hasAuthority("SCOPE_productos_stock_update")
+
                         .anyExchange().authenticated()
                 )
-
-                // 4. Deshabilita la autenticación por defecto (para evitar la contraseña generada)
+                // Activar JWT como Resource Server
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
                 .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
                 .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
-
                 .build();
     }
 }

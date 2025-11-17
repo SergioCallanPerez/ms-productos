@@ -42,6 +42,23 @@ dependencies {
     //Eureka Client
     implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
 
+    //Oauth
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+
+    //Actuator
+    implementation ("org.springframework.boot:spring-boot-starter-actuator")
+
+    //Prometheus
+    implementation ("io.micrometer:micrometer-registry-prometheus")
+
+    implementation ("io.opentelemetry:opentelemetry-exporter-otlp:1.35.0")
+	implementation ("io.micrometer:micrometer-tracing-bridge-otel")
+
+
+    developmentOnly("org.springframework.boot:spring-boot-devtools")
+
+    testImplementation("org.springframework.security:spring-security-test")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")

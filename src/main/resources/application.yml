@@ -5,8 +5,39 @@ spring:
     import: "optional:configserver:http://config-server:8888"
   profiles:
     active: dev
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://127.0.0.1:9000
 
   cloud:
     config:
       username: root
       password: s3cr3t
+
+logging:
+  level:
+    org.springframework.security.oauth2: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+    prometheus:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+  tracing:
+    enabled: true
+    sampling:
+      probability: 1.0
+  otlp:
+    tracing:
+      endpoint: http://tempo:4318
