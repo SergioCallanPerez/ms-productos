@@ -2,12 +2,43 @@ plugins {
     id("java")
     id("org.springframework.boot") version "3.4.3"
     id("io.spring.dependency-management") version "1.1.7"
-    id("maven-publish")
+    id ("jacoco")
+    id ("org.sonarqube") version "4.4.1.3373"
 }
 
 dependencyManagement {
     imports {
         mavenBom("org.springframework.cloud:spring-cloud-dependencies:2024.0.0")
+    }
+}
+
+jacoco {
+    toolVersion = "0.8.11"
+}
+
+sonarqube {
+    properties {
+        property("sonar.projectKey", "SergioCallanPerez_ms-pedidos")
+        property("sonar.organization", "sergiocallanperez")
+        property("sonar.host.url", "https://sonarcloud.io")
+
+        // Ubicación del reporte JaCoCo
+        property("sonar.java.coveragePlugin", "jacoco")
+        property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml")
+    }
+}
+
+
+tasks.test {
+    useJUnitPlatform()
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    reports {
+        xml.required = true
+        html.required = true
     }
 }
 
@@ -64,8 +95,4 @@ dependencies {
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-}
-
-tasks.test {
-    useJUnitPlatform()
 }
